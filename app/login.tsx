@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { defaultStyles } from '@/constants/Styles'
 import Colors from '@/constants/Colors'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo'
 
 enum SignInType {
   Phone,
@@ -12,17 +13,44 @@ enum SignInType {
   Apple,
 }
 
-const Page = () => {
+const Page =async () => {
 
   const [countryCode, setCountryCode] = useState<string>('+254')
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>('')
-
+  const router = useRouter();
+  const { signIn, isLoaded } = useSignIn()
   const keyBoardVerticalOffset = Platform.OS === 'ios' ? 90 : 0;
   const onSignIn = async (type: SignInType) => {
     if ( type === SignInType.Phone) {
+      if ( !isLoaded && !signIn) return null
+      try {
+        const fullPhoneNumber = `${countryCode}${phoneNumber}`
 
+        const { supportedFirstFactors } = await signIn?.create({
+          identifier: fullPhoneNumber
+        });
+        const firstPhoneFactor: any = supportedFirstFactors.find((factor: any) => {
+          return factor.strategy === 'phone_code'
+        });
+
+        const { phoneNumberId } = firstPhoneFactor;
+
+        await signIn?.prepareFirstFactor({
+          strategy: 'phone_code',
+          phoneNumberId
+        });
+
+        router.push({ pathname: '/verify/[phone]', params: { phone: fullPhoneNumber, signin: 'true'}})
+      } catch (err) {
+        console.error('error', JSON.stringify(err, null, 2));
+        if (isClerkAPIResponseError(err)) {
+          if ( err.errors[0].code === 'form_identifier_not_found') {
+            Alert.alert('Error', err.errors[0].message)
+          }
+        }
+      }
     }
-  }
+  };
   return (
     <KeyboardAvoidingView style={{ flex: 1}} behavior='padding' keyboardVerticalOffset={keyBoardVerticalOffset}>
       <View style={defaultStyles.container}>
@@ -41,7 +69,7 @@ const Page = () => {
           style={[styles.input,
           
           {flex: 1}]}
-          placeholder="0712345678"
+          placeholder="712345678"
           placeholderTextColor={Colors.gray}
           keyboardType='numeric'
           value={phoneNumber}
