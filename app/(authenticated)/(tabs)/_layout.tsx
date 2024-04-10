@@ -1,17 +1,23 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import Colors from '@/constants/Colors'
 
 const Layout = () => {
   return (
     <Tabs screenOptions={{
-      tabBarActiveTintColor: Colors.primary,
+      tabBarActiveTintColor: Colors.primary_violet[700],
     }}>
       <Tabs.Screen name="home" 
       options={{
         title: 'Home',
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: Colors.primary_zinc[900],  },
+        headerLeft: () => (
+          <TouchableOpacity style={{ marginLeft: 16}}>
+            <Ionicons name="person-circle-outline" size={36} color={Colors.primary_violet[700]} />
+          </TouchableOpacity>),
         tabBarIcon: ({size, color}) => (
           <FontAwesome name='home' size={size} color={color} />
         )

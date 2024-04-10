@@ -19,7 +19,7 @@ export const defaultStyles = StyleSheet.create({
     alignItems: 'center',
   },
   textLink: {
-    color: Colors.primary,
+    color: Colors.primary_violet[500],
     fontSize: 18,
     fontWeight: '500',
   },

@@ -133,7 +133,9 @@ const InitialLayout = () => {
                 ),
               }}
             />
-            <Stack.Screen name='(authenticated)/(tabs)' options={{ headerShown: false}}/>
+            <Stack.Screen name='(authenticated)/(tabs)' options={{ 
+              headerShown: false
+            }}/>
     </Stack>
   );
 }

@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   enabled: {
-    backgroundColor: Colors.primary
+    backgroundColor: Colors.primary_violet[300]
   },
   disabled: {
     backgroundColor: Colors.primaryMuted
